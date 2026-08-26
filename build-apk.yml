@@ -1,0 +1,37 @@
+name: Build IRANIN CITY APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Extract launcher project
+        run: |
+          mkdir project
+          unzip -q IRANIN-CITY-Launcher.zip -d project
+          cd project
+          echo "Project extracted"
+          find . -maxdepth 2 -type f | head -50
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Build APK
+        working-directory: project
+        run: gradle :app:assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: IRANIN-CITY-APK
+          path: project/app/build/outputs/apk/debug/app-debug.apk
